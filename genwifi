@@ -1,0 +1,5 @@
+#!/bin/sh
+
+ip link delete wlan
+ifconfig uap0 10.168.27.1
+

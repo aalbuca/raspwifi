@@ -1,0 +1,4 @@
+sudo apt-get install hostapd
+sudo apt-get install dnsmasq
+sudo iw dev wlan0 interface add uap0 type __ap
+sudo ip addr add 10.0.27.1/24 dev uap0
