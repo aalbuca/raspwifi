@@ -1,4 +1,32 @@
+#!/bin/bash
+
+sudo apt-get update
 sudo apt-get install hostapd
 sudo apt-get install dnsmasq
 sudo iw dev wlan0 interface add uap0 type __ap
-sudo ip addr add 10.0.27.1/24 dev uap0
+sudo ip addr add 10.0.27.1/28 dev uap0
+
+if [ -f "/etc/hostapd/hostapd.conf" ]
+then
+	mv /etc/hostapd/hostapd.conf /etc/hostapd/hostapd.conf.old
+fi
+
+if [ -f "/etc/dnsmasq.conf" ]
+then
+	mv /etc/dnsmasq.conf /etc/dnsmasq.conf.old
+fi
+
+if [ -f "/etc/rc.local" ]
+then
+	mv /etc/rc.local /etc/rc.local.old
+fi
+
+sudo cp hostapd.conf /etc/hostapd/hostapd.conf
+sudo cp dnsmasq.conf /etc/dnsmasq.conf
+sudo cp dhcpcd.conf /etc/dhcpcd.conf
+sudo cp hostapdstart /usr/local/bin/hostapdstart
+
+sudo chmod 667 /usr/local/bin/hostapdstart
+
+
+
