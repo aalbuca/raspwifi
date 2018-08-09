@@ -1,20 +1,30 @@
 #!/bin/bash
 
+
+echo ================================================
+echo                    Instalador SR
+echo ================================================
+
+echo ==================  Install Mosquitto  =====================
+if [ ! -f "/etc/apt/sources.list.d/mosquitto-stretch.list" ]
+then
+	wget http://repo.mosquitto.org/debian/mosquitto-repo.gpg.key
+	sudo apt-key add mosquitto-repo.gpg.key
+	rm mosquitto-repo.gpg.key
+	cd /etc/apt/sources.list.d/
+	sudo wget http://repo.mosquitto.org/debian/mosquitto-stretch.list
+	cd ~
+fi
+
 echo ==================  Update  =====================
 sudo apt-get --assume-yes update
 
 echo ==================  Install HOSTAPD and DNSMASQ  =====================
 sudo apt-get --assume-yes install hostapd
 sudo apt-get --assume-yes install dnsmasq
+sudo apt-get --assume-yes install mosquitto
 
-echo ==================  CREATE UAP0  =====================
-echo ==================  CHECK Exists UAP0  =====================
-FOUND=`grep "uap0:" /proc/net/dev`
-if [ ! -n "$FOUND" ]
-then
-	sudo iw dev wlan0 interface add uap0 type __ap
-	sudo ip addr add 10.0.27.1/28 dev uap0
-fi
+
 
 echo ==================  Check hostapd.conf  =====================
 if [ -f "/etc/hostapd/hostapd.conf" ] && [ ! -f "/etc/hostapd/hostapd.conf.old" ]
@@ -28,26 +38,75 @@ then
 	sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.old
 fi
 
-echo ==================  Check rc.local  =====================
-if [ -f "/etc/rc.local" ] && [ ! -f "/etc/rc.local.old" ]
+echo ==================  Check /etc/dhcpcd.conf  =====================
+if [ -f "/etc/dhcpcd.conf" ] && [ ! -f "/etc/dhcpcd.conf.old" ]
 then
-	sudo mv /etc/rc.local /etc/rc.local.old
+	sudo mv /etc/dhcpcd.conf /etc/dhcpcd.conf.old
 fi
 
-echo ==================  Check hostapdstart  =====================
-if [ -f "/usr/local/bin/hostapdstart" ]
+echo ===================== Create /etc/dhcpcd.conf =====================
+if [ -f "/etc/dhcpcd.conf" ]
 then
-	sudo rm /usr/local/bin/hostapdstart
+	sudo rm /etc/dhcpcd.conf
+fi
+sudo sh -c \
+'echo " 
+interface uap0
+	static ip_address=10.103.0.1/24
+	nohook wpa_supplicant
+" >> /etc/dhcpcd.conf'
+
+echo ===================== Create /etc/dnsmasq.conf ====================
+if [ -f "/etc/dnsmasq.conf" ]
+then
+	sudo rm /etc/dnsmasq.conf
+fi
+sudo sh -c \
+'echo "interface=uap0
+dhcp-range=10.103.0.2,10.103.0.255,255.255.255.0,24h
+" >> /etc/dnsmasq.conf'
+
+echo ===================== Create /etc/hostapd/hostapd.conf ============
+if [ -f "/etc/hostapd/hostapd.conf" ]
+then
+	sudo rm /etc/hostapd/hostapd.conf
+fi
+sudo sh -c \
+'echo "interface=uap0
+driver=nl80211
+ssid=SRCentral
+hw_mode=g
+channel=11
+macaddr_acl=0
+auth_algs=1
+wpa=2
+wpa_key_mgmt=WPA-PSK
+ignore_broadcast_ssid=0
+wpa_passphrase=Sm@rtR00ms#29052018
+rsn_pairwise=CCMP
+wpa_pairwise=TKIP" >> /etc/hostapd/hostapd.conf'
+
+echo ==================  Create sensorstartnet file  =====================
+if [ -f "/etc/network/if-up.d/sensorstartnet" ]
+then
+	sudo rm /etc/network/if-up.d/sensorstartnet
 fi
 
-echo ==================  Copy configuration files  =====================
-sudo cp hostapd.conf /etc/hostapd/hostapd.conf
-sudo cp dnsmasq.conf /etc/dnsmasq.conf
-sudo cp dhcpcd.conf /etc/dhcpcd.conf
-sudo cp hostapdstart /usr/local/bin/hostapdstart
+sudo sh -c \
+'echo "#!/bin/sh -e
 
-echo ==================  CHMOD hostapdstart  =====================
-sudo chmod 667 /usr/local/bin/hostapdstart
+if [ \"\$IFACE\" = lo ]; then
+	exit 0
+fi
+iw dev wlan0 interface add uap0 type __ap
+ip addr add 10.103.0.1/24 dev uap0
 
+hostapd -B /etc/hostapd/hostapd.conf
+
+/etc/init.d/dhcpcd restart
+
+" >> /etc/network/if-up.d/sensorstartnet'
+
+sudo chmod 755 /etc/network/if-up.d/sensorstartnet
 
 
