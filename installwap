@@ -1,11 +1,11 @@
 #!/bin/bash
 
 
-echo ================================================
-echo                    Instalador SR
-echo ================================================
+echo ============================================================
+echo                      Smart Rooms Installer
+echo ============================================================
 
-echo ==================  Install Mosquitto  =====================
+echo ==================  Install Mosquitto Repo  =====================
 if [ ! -f "/etc/apt/sources.list.d/mosquitto-stretch.list" ]
 then
 	wget http://repo.mosquitto.org/debian/mosquitto-repo.gpg.key
@@ -16,7 +16,7 @@ then
 	cd ~
 fi
 
-echo ==================  Update  =====================
+echo ==================  System Update  =====================
 sudo apt-get --assume-yes update
 
 echo ==================  Install HOSTAPD and DNSMASQ  =====================
@@ -24,25 +24,31 @@ sudo apt-get --assume-yes install hostapd
 sudo apt-get --assume-yes install dnsmasq
 sudo apt-get --assume-yes install mosquitto
 
+echo ================== Create backup config files  =====================
+hostapdconf="/etc/hostapd/hostapd.conf"
+dnsmasqconf="/etc/dnsmasq.conf"
+dhcpcdconf="/etc/dhcpcd.conf"
+conffiles=($hostapdconf $dnsmasqconf $dhcpcdconf)
+for conf in "${conffiles[@]}"
+do
+        if [ -f conf ] && [ ! -f "$conf.old" ]
+        then
+		echo 
+		echo ==== Move  $conf ====
+		sudo mv $conf "$conf.old"
+        fi
+done
 
-
-echo ==================  Check hostapd.conf  =====================
-if [ -f "/etc/hostapd/hostapd.conf" ] && [ ! -f "/etc/hostapd/hostapd.conf.old" ]
-then
-	sudo mv /etc/hostapd/hostapd.conf /etc/hostapd/hostapd.conf.old
-fi
-
-echo ==================  Check dnsmasq.conf  =====================
-if [ -f "/etc/dnsmasq.conf" ] && [ ! -f "/etc/dnsmasq.conf.old" ]
-then
-	sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.old
-fi
-
-echo ==================  Check /etc/dhcpcd.conf  =====================
-if [ -f "/etc/dhcpcd.conf" ] && [ ! -f "/etc/dhcpcd.conf.old" ]
-then
-	sudo mv /etc/dhcpcd.conf /etc/dhcpcd.conf.old
-fi
+echo ===================== Remove old config files  =====================
+for conf in "${conffiles[@]}"
+do
+        if [ -f conf ] && [ ! -f "$conf.old" ]
+        then
+		echo 
+		echo ==== rm  $conf ====
+		sudo rm $conf
+	fi
+done
 
 echo ===================== Create /etc/dhcpcd.conf =====================
 if [ -f "/etc/dhcpcd.conf" ]
@@ -66,11 +72,6 @@ sudo sh -c \
 dhcp-range=10.103.0.2,10.103.0.255,255.255.255.0,24h
 " >> /etc/dnsmasq.conf'
 
-echo ===================== Create /etc/hostapd/hostapd.wpa_psk ============
-if [ -f "/etc/hostapd/hostapd.wpa_psk" ]
-then
-	sudo rm /etc/hostapd/hostapd.wpa_pskg
-fi
 echo ===================== Create /etc/hostapd/hostapd.conf ============
 if [ -f "/etc/hostapd/hostapd.conf" ]
 then
