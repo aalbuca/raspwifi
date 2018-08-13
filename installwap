@@ -16,13 +16,27 @@ then
 	cd ~
 fi
 
+echo ==================  Install nginx Repo  =====================
+if [ ! -f "/etc/apt/sources.list.d/mosquitto-stretch.list" ]
+then
+	wget https://nginx.org/keys/nginx_signing.key
+	sudo apt-key add nginx_signing.key
+	rm nginx_signing.key
+	cd /etc/apt/sources.list.d/
+	sudo sh -c /
+'echo "deb http://nginx.org/packages/debian/ stretch nginx
+deb-src http://nginx.org/packages/debian/ stretch nginx" > nginx-stretch.list'
+	cd ~
+fi
+
 echo ==================  System Update  =====================
 sudo apt-get --assume-yes update
 
-echo ==================  Install HOSTAPD and DNSMASQ  =====================
+echo ==================  Install HOSTAPD, DNSMASQ, MOSQUITTO and NGINX  =====================
 sudo apt-get --assume-yes install hostapd
 sudo apt-get --assume-yes install dnsmasq
 sudo apt-get --assume-yes install mosquitto
+sudo apt-get --assume-yes install nginx
 
 echo ================== Create backup config files  =====================
 hostapdconf="/etc/hostapd/hostapd.conf"
