@@ -74,3 +74,6 @@ echo =================== UPDATE PATH =======================================
 export NODEJS_HOME=/usr/local/lib/nodejs/node-$NODEVERSION/bin
 export PATH=\$NODEJS_HOME:\$PATH
 
+echo =======================================================================
+echo =================== Install PM2 Daemonize NodeJS ======================
+npm install pm2 -g --unsafe-perm=true --allow-root

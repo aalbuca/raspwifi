@@ -17,7 +17,7 @@ then
 fi
 
 echo ==================  Install nginx Repo  =====================
-if [ ! -f "/etc/apt/sources.list.d/mosquitto-stretch.list" ]
+if [ ! -f "/etc/apt/sources.list.d/nginx-stretch.list" ]
 then
 	wget https://nginx.org/keys/nginx_signing.key
 	sudo apt-key add nginx_signing.key
@@ -36,7 +36,13 @@ echo ==================  Install HOSTAPD, DNSMASQ, MOSQUITTO and NGINX  ========
 sudo apt-get --assume-yes install hostapd
 sudo apt-get --assume-yes install dnsmasq
 sudo apt-get --assume-yes install mosquitto
+sudo apt-get --assume-yes install ntp
 sudo apt-get --assume-yes install nginx
+
+echo ================== Configure NTP Server  =====================
+sudo  sh -c 'echo "server 10.103.0.1 prefer" > /etc/ntp.conf'
+sudo service ntp restart
+
 
 echo ================== Create backup config files  =====================
 hostapdconf="/etc/hostapd/hostapd.conf"
