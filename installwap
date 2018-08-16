@@ -19,9 +19,10 @@ if [ ! -f "/etc/apt/sources.list.d/nginx-stretch.list" ]
 then
 	wget https://nginx.org/keys/nginx_signing.key
 	sudo apt-key add nginx_signing.key
-	rm nginx_signing.key
+	sudo rm nginx_signing.key
+	echo :::::: Remove ::::::::
 	cd /etc/apt/sources.list.d/
-	sudo sh -c /
+	sudo sh -c \
 'echo "deb http://nginx.org/packages/debian/ stretch nginx
 deb-src http://nginx.org/packages/debian/ stretch nginx" > nginx-stretch.list'
 	cd ~
@@ -100,8 +101,7 @@ then
 	sudo rm /etc/hostapd/hostapd.conf 
 fi 
 
-sudo sh -c \ 
-'echo "interface=uap0 driver=nl80211 ssid=SRCentral hw_mode=g channel=11 macaddr_acl=0 auth_algs=1 wpa=2 wpa_key_mgmt=WPA-PSK ignore_broadcast_ssid=0 
+sudo sh -c 'echo "interface=uap0 driver=nl80211 ssid=SRCentral hw_mode=g channel=11 macaddr_acl=0 auth_algs=1 wpa=2 wpa_key_mgmt=WPA-PSK ignore_broadcast_ssid=0 
 wpa_psk=aec9bf48e9b1245b95aaf8b9e8b6e4102e234810317f1492856c783d3975ff2d rsn_pairwise=CCMP wpa_pairwise=TKIP" >> /etc/hostapd/hostapd.conf'
 
 echo ================== Create sensorstartnet file ===================== 
