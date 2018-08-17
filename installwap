@@ -1,7 +1,5 @@
 #!/bin/bash
-echo ============================================================
-echo                      Smart Rooms Installer
-echo ============================================================
+echo ============================================================ echo Smart Rooms Installer echo ============================================================
 
 echo ==================  Install Mosquitto Repo  =====================
 if [ ! -f "/etc/apt/sources.list.d/mosquitto-stretch.list" ]
@@ -47,13 +45,8 @@ sudo  sh -c 'echo "listener 9001
 protocol websockets" > /etc/mosquitto/conf.d/mosq.conf'
 
 
-echo ================== Create backup config files  =====================
-hostapdconf="/etc/hostapd/hostapd.conf"
-dnsmasqconf="/etc/dnsmasq.conf"
-dhcpcdconf="/etc/dhcpcd.conf"
-conffiles=($hostapdconf $dnsmasqconf $dhcpcdconf)
-for conf in "${conffiles[@]}"
-do
+echo ================== Create backup config files ===================== hostapdconf="/etc/hostapd/hostapd.conf" dnsmasqconf="/etc/dnsmasq.conf" dhcpcdconf="/etc/dhcpcd.conf" conffiles=($hostapdconf $dnsmasqconf 
+$dhcpcdconf) for conf in "${conffiles[@]}" do
         if [ -f conf ] && [ ! -f "$conf.old" ]
         then
 		echo 
@@ -125,8 +118,7 @@ fi
 sudo sh -c \ 'echo "#!/bin/sh -e
 if [ \"\$IFACE\" = lo ];
 then
-	exit 0
-fi 
+	exit 0 fi
 
 iw dev wlan0 interface add uap0 type __ap
 ip addr add 10.103.0.1/24 dev uap0
