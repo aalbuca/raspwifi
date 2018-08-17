@@ -1,5 +1,7 @@
 #!/bin/bash
-echo ============================================================ echo Smart Rooms Installer echo ============================================================
+echo ============================================================
+echo Smart Rooms Installer
+echo ============================================================
 
 echo ==================  Install Mosquitto Repo  =====================
 if [ ! -f "/etc/apt/sources.list.d/mosquitto-stretch.list" ]
@@ -45,11 +47,16 @@ sudo  sh -c 'echo "listener 9001
 protocol websockets" > /etc/mosquitto/conf.d/mosq.conf'
 
 
-echo ================== Create backup config files ===================== hostapdconf="/etc/hostapd/hostapd.conf" dnsmasqconf="/etc/dnsmasq.conf" dhcpcdconf="/etc/dhcpcd.conf" conffiles=($hostapdconf $dnsmasqconf 
-$dhcpcdconf) for conf in "${conffiles[@]}" do
+echo ================== Create backup config files =====================
+hostapdconf="/etc/hostapd/hostapd.conf"
+dnsmasqconf="/etc/dnsmasq.conf"
+dhcpcdconf="/etc/dhcpcd.conf"
+conffiles=($hostapdconf $dnsmasqconf $dhcpcdconf)
+for conf in "${conffiles[@]}"
+do
         if [ -f conf ] && [ ! -f "$conf.old" ]
         then
-		echo 
+		echo
 		echo ==== Move  $conf ====
 		sudo mv $conf "$conf.old"
         fi
@@ -72,7 +79,7 @@ then
 	sudo rm /etc/dhcpcd.conf
 fi
 sudo sh -c \
-'echo " 
+'echo "
 interface uap0
 	static ip_address=10.103.0.1/24
 	nohook wpa_supplicant
@@ -92,7 +99,7 @@ echo ===================== Create /etc/hostapd/hostapd.conf ============
 if [ -f "/etc/hostapd/hostapd.conf" ]
 then
 	sudo rm /etc/hostapd/hostapd.conf
-fi 
+fi
 
 sudo sh -c 'echo "interface=uap0
 driver=nl80211
@@ -118,7 +125,8 @@ fi
 sudo sh -c \ 'echo "#!/bin/sh -e
 if [ \"\$IFACE\" = lo ];
 then
-	exit 0 fi
+	exit 0
+fi
 
 iw dev wlan0 interface add uap0 type __ap
 ip addr add 10.103.0.1/24 dev uap0
