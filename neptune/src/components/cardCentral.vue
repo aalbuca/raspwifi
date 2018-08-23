@@ -59,6 +59,7 @@
 <script>
 import { connect } from "mqtt";
 import AppVue from '@/App.vue';
+import axios from "axios";
 import CentralPane from '@/views/CentralPane.vue';
 var objcardCentral = null;
 const client = connect("ws://192.168.0.104", { port: 9001 });
@@ -95,6 +96,17 @@ export default {
     objcardCentral = this;
     return;
   },
+  mounted() {
+    var config = {
+      headers: {'Access-Control-Allow-Origin': '*'}
+    };
+    axios({ method: "GET", "url": "http://localhost:8100/api/v1.0/sensors/" }, config).then(result => {
+        console.debug(result.data);
+        objcardCentral.items[0].room.sensors = result.data;
+    }, error => {
+        console.error(error);
+    });
+  },
   methods: {
     switchChange(data) {
       var lightState = 0;
@@ -102,6 +114,7 @@ export default {
       client.publish(data.sensor + "/relay/0/set", lightState.toString());
       return;
     }
+
   }
 }
 
