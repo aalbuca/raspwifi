@@ -37,9 +37,18 @@ sudo apt-get --assume-yes install dnsmasq
 sudo apt-get --assume-yes install mosquitto
 sudo apt-get --assume-yes install ntp
 sudo apt-get --assume-yes install nginx
+sudo npm install -g --unsafe-perm node-red
 
 echo ================== Configure NTP Server  =====================
-sudo  sh -c 'echo "server 10.103.0.1 prefer" > /etc/ntp.conf'
+sudo  sh -c \
+'echo "server a.st1.ntp.br prefer
+b.st1.ntp.br prefer
+c.st1.ntp.br prefer
+d.st1.ntp.br prefer
+a.ntp.br prefer
+b.ntp.br prefer
+c.ntp.br prefer
+gps.ntp.br prefer" > /etc/ntp.conf'
 sudo service ntp restart
 
 echo ================== Configure Mosquitto Conf===================
